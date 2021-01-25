@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <node name="controller"
+        pkg="buggy_robot"
+        type="controller_node.py"
+        output="screen"
+        respawn="true">
+  </node>
+
+  <node name="hardware"
+        pkg="buggy_robot"
+        type="hardware_node.py"
+        output="screen"
+        respawn="true">
+  </node>
+
+</launch>
