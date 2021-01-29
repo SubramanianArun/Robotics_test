@@ -23,7 +23,8 @@ class HardwareNode:
 
     def command_cb(self, cmd_msg):
         self.hardware.set_command(cmd_msg.cmd)
-    
+        print(cmd_msg.cmd) # Prints PID command to the user in terminal
+
     def reset_cb(self, reset_req):
         resp = TriggerResponse()
         # Only reset state; do not swap hardware model
@@ -31,7 +32,7 @@ class HardwareNode:
         resp.success = True
         resp.message = 'Reset state for current hardware.'
         return resp
-    
+
     def next_cb(self, reset_req):
         resp = TriggerResponse()
         # Only reset state; do not swap hardware model
@@ -45,7 +46,7 @@ class HardwareNode:
         state_msg.stamp.data = rospy.Time.now()
         state_msg.x, state_msg.x_dot = self.hardware.get_state()
         self.state_pub.publish(state_msg)
-    
+
     def run(self):
         rate = rospy.Rate(40) # 40Hz
         while not rospy.is_shutdown():

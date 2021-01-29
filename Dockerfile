@@ -29,4 +29,3 @@ RUN source /opt/ros/noetic/setup.bash && \
     cd catkin_ws && \
     catkin_make && \
     echo "source ${ROBOT_WS}/catkin_ws/devel/setup.bash" >> ~/.bashrc
-
