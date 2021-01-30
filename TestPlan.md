@@ -48,9 +48,9 @@ There are three primary requirements in the test schedule: Actuator position, Ba
 - Type the command ```docker exec -it [imageid] /bin/sh``` in the terminal.
 - A shell terminal opens by default. It will be indicated by the label 'sh' followed by some digits like 4.0 or 5.0 (varies with user). Next step is to source the environments.
 - Type the following commands in the second shell window that opened from the docker container
-> echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
-> echo “source /home/robot/catkin_ws/devel/setup.bash” >> ~/.bashrc
-> source ~/.bashrc
+- ```echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc```
+- ```echo “source /home/robot/catkin_ws/devel/setup.bash” >> ~/.bashrc```
+- ```source ~/.bashrc```
 - The terminal prompt will change from 'sh-5.0' to root@[imageid]:/home/robot. Now the terminal is inside the ROS environment that can be used for testing
 - Run ``` sudo apt-get update``` and ```sudo apt-get upgrade``` to update the container to the latest version.
 - Navigate to the folder 'catkin_ws' in the /home/robot folder using the command ```cd /home/robot/catkin_ws/```
@@ -141,9 +141,12 @@ Change requests can be raised in case a section of the code needs to be looked i
    | Maintenance    | version 1.0    | LOW            |                |
 
 #### 11) ITEM PASS/FAIL CRITERIA
-**Position** : The actuator position lies between +/- 0.05m of the target set point
-**Battery Life** : The robot runs for atleast 60 minutes on a single charge
-**Maintenance Cycle** : The robot runs for at least 3 months before any hardware replacement
+**Position** : The actuator position lies between +/- 0.05m of the target set point.
+
+**Battery Life** : The robot runs for atleast 60 minutes on a single charge.
+
+**Maintenance Cycle** : The robot runs for at least 3 months before any hardware replacement.
+
 #### 12) SUSPENSION/RESUMPTION CRITERIA
 This section of the document outlines the suspension criteria of all or a portion of the modules while testing. Testing is suspended temporarily or  until the conditions get better so as to avoid equipment damage or serious consequential errors.
 ##### 12.1) Suspension:
