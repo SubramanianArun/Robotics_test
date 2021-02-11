@@ -20,7 +20,7 @@ class ControllerNode:
         self.disable_srv = rospy.Service('~disable', Trigger, self.disable_cb)
         self.target_srv = rospy.Service('~set_target', SetTarget, self.set_target_cb)
         self.cmd_pub = rospy.Publisher('~command', Command, queue_size=5)
-        
+
         # Internal variables
         self.latest_state = State()
         self.controller = Controller()
@@ -28,22 +28,23 @@ class ControllerNode:
 
     def state_cb(self, state_msg):
         self.latest_state = state_msg
-    
+
     def set_target_cb(self, target_req):
         resp = SetTargetResponse()
         resp.success = self.controller.set_target(target_req.x_target)
         if not resp.success:
             resp.message = 'Target out of range, must be in [0,0.5]'
-
+        if not self.enabled:
+            resp.message = 'Controller is not enabled'
         return resp
-    
+
     def enable_cb(self, enable_req):
         self.enabled = True
         resp = TriggerResponse()
         resp.success = True
         resp.message = 'Enabled control'
         return resp
-    
+
     def disable_cb(self, disable_req):
         self.enabled = False
         self.controller.reset()
@@ -63,11 +64,51 @@ class ControllerNode:
         cmd_msg.stamp.data = rospy.Time.now()
         cmd_msg.cmd = cmd
         self.cmd_pub.publish(cmd_msg)
-    
+
+    def tolerance_check(self, targetValue, currentValue):
+        '''
+        Checks if the actuator position is within the tolerance limit
+
+            Parameters:
+                targetValue (float): The target position
+                currentValue (float): The current position
+
+            Returns:
+                OK (bool): Pass or Fail
+        '''
+        if (targetValue - currentValue) <= 0.05:
+            return True
+        else:
+            return False
+
+    #def run(self, inputvalue):
     def run(self):
+        '''
+        This method is modified to accomodate the testing of position as
+        the service methods weren't working. This method basically does the following:
+         - gets initialised with a position value
+         - enables the controller
+         - sends target position
+         - obtains current position from hardware
+         - checks for limits
+         - stops on reaching the saturation values obtained from trial and error experiments
+        '''
         rate = rospy.Rate(20) # 20Hz
+        #saturation_hashmap = {0.1:0.088, 0.2:0.176, 0.3:0.264, 0.4:0.352, 0.5:0.441} #Hashmap of known saturation values
+        # position = SetTarget() # Create a target object for setting position
+        # position.x_target = inputvalue # Assign values runtime from the function call
+
         while not rospy.is_shutdown():
+            # self.enable_cb(True)
+            # self.set_target_cb(position)
             self.send_cmd()
+            print ("Position: %.3f" %self.latest_state.x) # Print current position
+            # if (float(str(self.latest_state.x)[:5]) == saturation_hashmap[inputvalue]): # If it reaches saturation value, stop the loop
+            #     if (self.tolerance_check(inputvalue,self.latest_state.x)):
+            #         print("Actuator test passed for value: %f" %inputvalue)
+            #     else:
+            #         print("Actuator test failed for value: %f" %inputvalue)
+            #     break
             rate.sleep()
 
 
@@ -76,4 +117,5 @@ if __name__ == '__main__':
         n = ControllerNode()
         n.run()
     except rospy.ROSInterruptException:
+        n.disable_cb(True)
         pass

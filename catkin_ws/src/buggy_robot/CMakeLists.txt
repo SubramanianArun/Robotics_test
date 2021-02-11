@@ -65,4 +65,4 @@ catkin_install_python(PROGRAMS nodes/controller_node.py nodes/hardware_node.py
 # endif()
 
 ## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+catkin_add_nosetests(test/position_test.py)
