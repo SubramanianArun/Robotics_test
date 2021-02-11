@@ -34,7 +34,8 @@ class ControllerNode:
         resp.success = self.controller.set_target(target_req.x_target)
         if not resp.success:
             resp.message = 'Target out of range, must be in [0,0.5]'
-
+        if not self.enabled:
+            resp.message = 'Controller is not enabled'
         return resp
 
     def enable_cb(self, enable_req):
@@ -80,7 +81,8 @@ class ControllerNode:
         else:
             return False
 
-    def run(self, inputvalue):
+    #def run(self, inputvalue):
+    def run(self):
         '''
         This method is modified to accomodate the testing of position as
         the service methods weren't working. This method basically does the following:
@@ -92,28 +94,28 @@ class ControllerNode:
          - stops on reaching the saturation values obtained from trial and error experiments
         '''
         rate = rospy.Rate(20) # 20Hz
-        saturation_hashmap = {0.1:0.088, 0.2:0.176, 0.3:0.264, 0.4:0.352, 0.5:0.441} #Hashmap of known saturation values
-        position = SetTarget() # Create a target object for setting position
-        position.x_target = inputvalue # Assign values runtime from the function call
-        #currentposition = self.latest_state.x # Assign current position to a variable
+        #saturation_hashmap = {0.1:0.088, 0.2:0.176, 0.3:0.264, 0.4:0.352, 0.5:0.441} #Hashmap of known saturation values
+        # position = SetTarget() # Create a target object for setting position
+        # position.x_target = inputvalue # Assign values runtime from the function call
+
         while not rospy.is_shutdown():
-            self.enable_cb(True)
-            self.set_target_cb(position)
+            # self.enable_cb(True)
+            # self.set_target_cb(position)
             self.send_cmd()
             print ("Position: %.3f" %self.latest_state.x) # Print current position
-            if (float(str(self.latest_state.x)[:5]) == saturation_hashmap[inputvalue]): # If it reaches saturation value, stop the loop
-                if (self.tolerance_check(inputvalue,self.latest_state.x)):
-                    print("Actuator test passed for value: %f" %inputvalue)
-                else:
-                    print("Actuator test failed for value: %f" %inputvalue)
-                break
+            # if (float(str(self.latest_state.x)[:5]) == saturation_hashmap[inputvalue]): # If it reaches saturation value, stop the loop
+            #     if (self.tolerance_check(inputvalue,self.latest_state.x)):
+            #         print("Actuator test passed for value: %f" %inputvalue)
+            #     else:
+            #         print("Actuator test failed for value: %f" %inputvalue)
+            #     break
             rate.sleep()
 
 
 if __name__ == '__main__':
     try:
         n = ControllerNode()
-        n.run(0.3)
+        n.run()
     except rospy.ROSInterruptException:
         n.disable_cb(True)
         pass
